@@ -1,38 +1,35 @@
-def get_checksum(data,divisor):
-    quotient = []
-    curr = data[:len(divisor)]
-    n = len(divisor)
-    for i in range(n,len(data)+1):
-        if curr[0] == 0:
-            subtr = [0]*n
-            quotient.append(0)
-        else: 
-            subtr = [j for j in divisor]
-            quotient.append(1)
-        curr = [curr[j]^subtr[j] for j in range(n)]
-        if i == len(data):
-            curr = curr[1:]
-        else:
-            curr = curr[1:] + [data[i]]
-    return curr
-
-
-choice = int(input("1.Send\n2.Check error\n"))
-if choice == 1:
-    data = [ord(i)-48 for i in input("Enter input to send : ")]
-    divisor = [ord(i)-48 for i in input("Enter divisor : ")]
-    data = data + [0]*(len(divisor)-1)
-    n = len(divisor)
-    data = data[:-4] + get_checksum(data,divisor)
-    ret = ''
+def crc():
+    data=list(map(int,input("Enter the data to be sent: ")))
     for i in data:
-        ret += str(i)
-    print(ret)
-    
-else:
-    data = [ord(i)-48 for i in input("Enter input to check : ")]
-    divisor = [ord(i)-48 for i in input("Enter divisor : ")]
-    if get_checksum(data,divisor) == [0]*4 :
-        print('Data Correct ')
-    else: 
-        print('Data Incorrect')
+        if (i!=0 and i!=1):
+            print("Wrong Data")
+            return 0
+    sizedata=len(data)
+    generator=list(map(int,input("Enter the Generator: ")))
+    for i in generator:
+        if (i!=0 and i!=1):
+            print("Wrong Generator")
+            return 0
+    sizegen=len(generator)
+    if(sizegen>=sizedata):
+        print("Generator should be smaller than Data")
+        return(0)
+#------------------------------------------------------
+    for i in range(sizegen-1):
+        data.append(0)
+    remain=data[:sizegen-1]
+    mul=1
+    for j in range(sizedata):
+        remain.append(data[sizegen+j-1])
+        if(mul==1):
+            for i in range(sizegen):
+                remain[i]=remain[i]^generator[i]
+        remain.pop(0)
+        mul=remain[0]
+    data=data[:-sizegen+1]+remain
+    data=list(map(str, data))
+    sep=""
+    data=sep.join(data)
+    print(data)
+
+crc()
